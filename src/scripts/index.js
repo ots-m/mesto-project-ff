@@ -1,6 +1,7 @@
 import '../pages/index.css';
-import { openPopup, closePopup } from './components/popup.js';
-import { initialCards, cardAdd, cardDelete, likeToggle } from './components/cards.js';
+import { initialCards} from './components/cards.js';
+import { openPopup, closePopup } from './components/modal.js';
+import { cardAdd, cardDelete, likeToggle } from './components/card.js'
 
 const cardList = document.querySelector('.places__list');
 
@@ -8,8 +9,6 @@ const formEditProfile = document.forms['edit-profile'];
 const nameInput = formEditProfile.querySelector('.popup__input_type_name');
 const descriptionInput = formEditProfile.querySelector('.popup__input_type_description');
 
-nameInput.value = document.querySelector('.profile__title').textContent;
-descriptionInput.value = document.querySelector('.profile__description').textContent;
 const profileNameElement = document.querySelector('.profile__title'); 
 const profileDescriptionElement = document.querySelector('.profile__description');
 
@@ -62,22 +61,17 @@ function resetFormEditInputs() {
   descriptionInput.value = document.querySelector('.profile__description').textContent;
 }
 
-function clearNewCardForm() {
-  newCardNameInput.value = '';
-  newCardLinkInput.value = '';
-}
-
 function handleOpenPopup(popup) {
   if (popup === popupTypeEdit) {
     resetFormEditInputs();
   } else if (popup === popupTypeAdd) {
-    clearNewCardForm();
+    formNewCard.reset();
   }
   
   openPopup(popup);
 }
 
-function handleFormSubmit(evt) {
+function handleFormEditProfileSubmit(evt) {
   evt.preventDefault(); 
 
   const nameValue = nameInput.value;
@@ -89,7 +83,7 @@ function handleFormSubmit(evt) {
   closePopup(popupTypeEdit);
 }
 
-formEditProfile.addEventListener('submit', handleFormSubmit); 
+formEditProfile.addEventListener('submit', handleFormEditProfileSubmit); 
 
 function newCard(evt) {
   evt.preventDefault();
@@ -105,9 +99,6 @@ function newCard(evt) {
   const cardElement = cardAdd(newCard, cardDelete, openPopupImage, likeToggle);
   cardList.prepend(cardElement);
   
-  newCardNameInput.value = ''; 
-  newCardLinkInput.value = ''; 
-
   closePopup(popupTypeAdd);
 }
 
