@@ -1,4 +1,4 @@
-export const cardAdd = (card, cardDelete, openPopupImage, likeToggle) => {
+export const createCard = (card, cardDelete, openPopupImage, likeToggle) => {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
   const cardImage = cardElement.querySelector('.card__image');

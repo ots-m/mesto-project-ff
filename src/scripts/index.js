@@ -1,7 +1,7 @@
 import '../pages/index.css';
 import { initialCards} from './components/cards.js';
 import { openPopup, closePopup } from './components/modal.js';
-import { cardAdd, cardDelete, likeToggle } from './components/card.js'
+import { createCard, cardDelete, likeToggle } from './components/card.js'
 
 const cardList = document.querySelector('.places__list');
 
@@ -31,7 +31,7 @@ const buttons = [profileEditButton, profileAddButton];
 const closeButton = document.querySelectorAll('.popup__close');
 
 initialCards.forEach(card => {
-  const cardElement = cardAdd(card, cardDelete, openPopupImage, likeToggle);
+  const cardElement = createCard(card, cardDelete, openPopupImage, likeToggle);
   cardList.append(cardElement);
 });
 
@@ -96,7 +96,7 @@ function newCard(evt) {
     link: cardLink
   };
 
-  const cardElement = cardAdd(newCard, cardDelete, openPopupImage, likeToggle);
+  const cardElement = createCard(newCard, cardDelete, openPopupImage, likeToggle);
   cardList.prepend(cardElement);
   
   closePopup(popupTypeAdd);
