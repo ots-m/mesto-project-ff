@@ -36,20 +36,6 @@ export const updateUserInfo = (nameValue, descriptionValue) => {
   });
 };
 
-export const checkImageUrl = (url) => {
-  return fetch(url, {
-    method: "HEAD",
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    const contentType = res.headers.get("Content-Type");
-    if (contentType.startsWith("image/")) {
-      return Promise.resolve();
-    }
-  });
-};
-
 export const updateUserAvatar = (imageLink) => {
   return fetch(`${config.baseUrl}/users/me/avatar `, {
     method: "PATCH",

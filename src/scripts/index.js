@@ -9,7 +9,6 @@ import {
   updateUserInfo,
   createNewCard,
   updateUserAvatar,
-  checkImageUrl,
 } from "./components/api.js";
 
 const cardList = document.querySelector(".places__list");
@@ -36,7 +35,6 @@ const popupTypeAdd = document.querySelector(".popup_type_new-card");
 const popupTypeImage = document.querySelector(".popup_type_image");
 const popupTypeConfirm = document.querySelector(".popup_type_confirm");
 const popupTypeEditProfileAvatar = document.querySelector(".popup_type_edit_profile_avatar");
-const popupTypeError = document.querySelector(".popup_type_error");
 const popups = [
   popupTypeEdit,
   popupTypeAdd,
@@ -44,8 +42,6 @@ const popups = [
   popupTypeConfirm,
   popupTypeEditProfileAvatar,
 ];
-
-const popupTypeErrorParagraph = popupTypeError.querySelector(".popup__paragraph");
 
 const buttonConfirm = popupTypeConfirm.querySelector(".popup__button_confirm");
 const buttonEditProfileAvatar = document.querySelector(".profile__image_button-edit");
@@ -83,7 +79,6 @@ getUserInfo()
 
 getCards()
   .then((data) => {
-    console.log(data);
     data.forEach((card) => {
       const cardElement = createCard(card, handleCardDelete, openPopupImage, likeToggle, currentUserId);
       cardList.append(cardElement);
@@ -135,9 +130,7 @@ closeButton.forEach((closeButton) => {
 
 function resetFormEditInputs() {
   nameInput.value = document.querySelector(".profile__title").textContent;
-  descriptionInput.value = document.querySelector(
-    ".profile__description"
-  ).textContent;
+  descriptionInput.value = document.querySelector(".profile__description").textContent;
 }
 
 function handleOpenPopup(popup) {
@@ -166,8 +159,7 @@ function handleFormEditProfileSubmit(evt) {
   profileDescriptionElement.textContent = descriptionValue;
 
   updateUserInfo(nameValue, descriptionValue)
-    .then((data) => {
-      console.log(data);
+    .then((data) => {;
       profileNameElement.textContent = data.name;
       profileDescriptionElement.textContent = data.about;
     })
@@ -222,25 +214,13 @@ function editAvatar(evt) {
   setButtonText(evt.target, true);
   const imageLink = document.querySelector("#edit-profile").value;
 
-  checkImageUrl(imageLink)
-    .then(() => {
-      return updateUserAvatar(imageLink);
-    })
+  updateUserAvatar(imageLink)
     .then(() => {
       profileImage.style.backgroundImage = `url('${imageLink}')`;
       closePopup(popupTypeEditProfileAvatar);
     })
     .catch((err) => {
       console.log(err);
-      let message = "";
-      openPopup(popupTypeError);
-      if (err.name === "TypeError") {
-        message = `URL ведёт не на изображение`;
-      } else {
-        message = `${err} - ${err.message}`;
-      }
-
-      popupTypeErrorParagraph.textContent = message;
     })
     .finally(() => {
       setButtonText(evt.target, false);
