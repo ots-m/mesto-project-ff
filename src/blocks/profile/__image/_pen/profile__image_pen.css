@@ -1,0 +1,14 @@
+.profile__image_pen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0,0,0,0);
+  transform: translate(-50%, -50%);
+}

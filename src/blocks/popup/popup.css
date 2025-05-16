@@ -1,12 +1,18 @@
 @import url('./__content/popup__content.css');
 @import url('./__content/_content/popup__content_content_image.css');
+@import url('./__content/_content/popup__content_content_confirm.css');
+@import url('./__content/_content/popup__content_content_edit_profile_avatar.css');
 @import url('./__close/popup__close.css');
 @import url('./__title/popup__title.css');
 @import url('./__form/popup__form.css');
 @import url('./__input/popup__input.css');
 @import url('./__button/popup__button.css');
+@import url('./__button/_confirm/popup__button_confirm.css');
 @import url('./__caption/popup__caption.css');
 @import url('./__image/popup__image.css');
+@import url('./__button/_button-inactive/button_inactive.css');
+@import url('./__input/_error/_input_type_error.css');
+@import url('./__container/_container.css');
 
 .popup {
   font-family: 'Inter', Arial, sans-serif;

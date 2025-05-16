@@ -1,0 +1,14 @@
+.form__input_type_error {
+  border-bottom-color: red; 
+}
+
+.form__input_error {
+  display: none;
+}
+
+.form__input-error_active {
+  display: block;
+  position: absolute;
+  color: red;
+  font-size: 12px;
+} 
