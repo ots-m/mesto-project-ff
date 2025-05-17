@@ -26,8 +26,9 @@ let newCardNameInput = formNewCard.querySelector(".popup__input_type_card-name")
 let newCardLinkInput = formNewCard.querySelector(".popup__input_type_url");
 
 const formEditProfileAvatar = document.forms["edit-profile-avatar"];
+const formDeleteCardConfirm = document.forms["delete-card-confirm"];
 
-const forms = [formEditProfile, formNewCard, formEditProfileAvatar ];
+const forms = [formNewCard, formEditProfileAvatar];
 
 const popupImage = document.querySelector(".popup__image");
 const popupDescription = document.querySelector(".popup__caption");
@@ -38,14 +39,13 @@ const popupTypeImage = document.querySelector(".popup_type_image");
 const popupTypeConfirm = document.querySelector(".popup_type_confirm");
 const popupTypeEditProfileAvatar = document.querySelector(".popup_type_edit_profile_avatar");
 const popups = [
-  popupTypeEdit,
   popupTypeAdd,
   popupTypeEditProfileAvatar,
+  popupTypeEdit,
   popupTypeImage,
   popupTypeConfirm,
 ];
 
-const buttonConfirm = popupTypeConfirm.querySelector(".popup__button_confirm");
 const buttonEditProfileAvatar = document.querySelector(".profile__image_button-edit");
 
 let cardIdToDelete = null;
@@ -55,7 +55,7 @@ let currentUserId = null;
 
 const profileEditButton = document.querySelector(".profile__edit-button");
 const profileAddButton = document.querySelector(".profile__add-button");
-const buttons = [profileEditButton, profileAddButton, buttonEditProfileAvatar];
+const buttons = [profileAddButton, buttonEditProfileAvatar];
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -75,6 +75,7 @@ const cardData = {
 Promise.all([getUserInfo(), getCards()])
   .then(([userData, cards]) => {
     currentUserId = userData._id;
+
     profileDescriptionElement.textContent = userData.about;
     profileNameElement.textContent = userData.name;
     profileImage.style.backgroundImage = `url('${userData.avatar}')`;
@@ -88,25 +89,6 @@ Promise.all([getUserInfo(), getCards()])
     console.log(err);
   })
 
-function handleCardDelete(cardElement) {
-  openPopup(popupTypeConfirm);
-  cardIdToDelete = cardElement.dataset.id;
-  cardElementToDelete = cardElement;
-}
-
-buttonConfirm.addEventListener("click", () => {
-    getCardToDelete(cardIdToDelete)
-    .then(() => {
-      cardDelete(cardElementToDelete);
-      cardIdToDelete = null;
-      cardElementToDelete = null;
-      closePopup(popupTypeConfirm);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
 function openPopupImage(card) {
   popupDescription.textContent = card.name;
   popupImage.alt = card.name;
@@ -115,26 +97,13 @@ function openPopupImage(card) {
   openPopup(popupTypeImage);
 }
 
-buttons.forEach((button, index) => {
-  button.addEventListener("click", () => {
-    resetAndOpenPopup({
-      form: forms[index],
-      popup: popups[index],
-      resetForm: resetFormEditInputs,
-    });
-  });
-});
-
 popups.forEach(popup => {
   setModalWindowEventListeners(popup);
 })
 
-function resetFormEditInputs() {
-  getUserInfo()
-  .then(data => {
-    nameInput.value = data.name;
-    descriptionInput.value = data.about;
-  });
+function resetFormEditProfileInputs() {
+  nameInput.value = profileNameElement.textContent;
+  descriptionInput.value = profileDescriptionElement.textContent;
 }
 
 function resetAndOpenPopup({form, popup, resetForm = () => form.reset()}) {
@@ -145,8 +114,26 @@ function resetAndOpenPopup({form, popup, resetForm = () => form.reset()}) {
   openPopup(popup);
 }
 
+buttons.forEach((button, index) => {
+  button.addEventListener("click", () => {
+    resetAndOpenPopup({
+      form: forms[index],
+      popup: popups[index],
+      resetForm: () => forms[index].reset(),
+    });
+  });
+});
+
+profileEditButton.addEventListener("click", () => {
+  resetAndOpenPopup({
+  form: formEditProfile,
+  popup: popupTypeEdit,
+  resetForm: resetFormEditProfileInputs,
+  })
+})
 
 function handleFormEditProfileSubmit(evt) {
+  evt.preventDefault();
 
   setButtonText(evt.target, true);
   const nameValue = nameInput.value;
@@ -172,7 +159,8 @@ function handleFormEditProfileSubmit(evt) {
 
 formEditProfile.addEventListener("submit", handleFormEditProfileSubmit);
 
-function newCard(evt) {
+function handleCardFormSubmit(evt) {
+  evt.preventDefault();
 
   setButtonText(evt.target, true);
   const cardName = newCardNameInput.value;
@@ -198,9 +186,33 @@ function newCard(evt) {
     });
 }
 
-formNewCard.addEventListener("submit", newCard);
+formNewCard.addEventListener("submit", handleCardFormSubmit);
 
-function editAvatar(evt) {
+function handleCardDelete(cardElement) {
+  openPopup(popupTypeConfirm);
+  cardIdToDelete = cardElement.dataset.id;
+  cardElementToDelete = cardElement;
+}
+
+function handleCardConfirmFormSubmit(evt) {
+  evt.preventDefault();
+
+  getCardToDelete(cardIdToDelete)
+  .then(() => {
+    cardDelete(cardElementToDelete);
+    cardIdToDelete = null;
+    cardElementToDelete = null;
+    closePopup(popupTypeConfirm);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+}
+
+formDeleteCardConfirm.addEventListener("submit", handleCardConfirmFormSubmit);
+
+function handleAvatarFormSubmit(evt) {
+  evt.preventDefault();
 
   setButtonText(evt.target, true);
   const imageLink = document.querySelector("#edit-profile").value;
@@ -208,6 +220,7 @@ function editAvatar(evt) {
   updateUserAvatar(imageLink)
     .then(() => {
       profileImage.style.backgroundImage = `url('${imageLink}')`;
+      
       closePopup(popupTypeEditProfileAvatar);
     })
     .catch((err) => {
@@ -218,7 +231,7 @@ function editAvatar(evt) {
     });
 }
 
-formEditProfileAvatar.addEventListener("submit", editAvatar);
+formEditProfileAvatar.addEventListener("submit", handleAvatarFormSubmit);
 
 function setButtonText(form, isLoading) {
   const button = form.querySelector(".popup__button");
