@@ -31,13 +31,21 @@ function hasInvalidInput(inputList) {
   })
 }
 
+const disableSubmitButton = (buttonElement, config) => {
+  buttonElement.disabled = true;
+  buttonElement.classList.add(config.inactiveButtonClass);
+};
+
+const enableSubmitButton = (buttonElement, config) => {
+  buttonElement.disabled = false;
+  buttonElement.classList.remove(config.inactiveButtonClass);
+};
+
 function toggleButtonState(inputList, buttonElement, config) {
   if(hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(config.inactiveButtonClass);
+    disableSubmitButton(buttonElement, config);
   } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(config.inactiveButtonClass);
+    enableSubmitButton(buttonElement, config);
   }
 }
 
@@ -72,5 +80,5 @@ export const clearValidation = (formElement, config) => {
     inputElement.setCustomValidity("");
   });
 
-  toggleButtonState(inputList, buttonElement, config);
+  disableSubmitButton(buttonElement, config);
 };

@@ -1,5 +1,5 @@
 import "../pages/index.css";
-import { openPopup, closePopup } from "./components/modal.js";
+import { openPopup, closePopup, setModalWindowEventListeners } from "./components/modal.js";
 import { createCard, likeToggle, cardDelete } from "./components/card.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
 import {
@@ -27,6 +27,8 @@ let newCardLinkInput = formNewCard.querySelector(".popup__input_type_url");
 
 const formEditProfileAvatar = document.forms["edit-profile-avatar"];
 
+const forms = [formEditProfile, formNewCard, formEditProfileAvatar ];
+
 const popupImage = document.querySelector(".popup__image");
 const popupDescription = document.querySelector(".popup__caption");
 
@@ -38,9 +40,9 @@ const popupTypeEditProfileAvatar = document.querySelector(".popup_type_edit_prof
 const popups = [
   popupTypeEdit,
   popupTypeAdd,
+  popupTypeEditProfileAvatar,
   popupTypeImage,
   popupTypeConfirm,
-  popupTypeEditProfileAvatar,
 ];
 
 const buttonConfirm = popupTypeConfirm.querySelector(".popup__button_confirm");
@@ -53,9 +55,7 @@ let currentUserId = null;
 
 const profileEditButton = document.querySelector(".profile__edit-button");
 const profileAddButton = document.querySelector(".profile__add-button");
-const buttons = [profileEditButton, profileAddButton];
-
-const closeButton = document.querySelectorAll(".popup__close");
+const buttons = [profileEditButton, profileAddButton, buttonEditProfileAvatar];
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -66,36 +66,36 @@ const validationConfig = {
   errorClass: "form__input-error_active",
 };
 
-getUserInfo()
-  .then((userData) => {
+const cardData = { 
+  handleCardDelete, 
+  openPopupImage, 
+  likeToggle, 
+};
+
+Promise.all([getUserInfo(), getCards()])
+  .then(([userData, cards]) => {
     currentUserId = userData._id;
     profileDescriptionElement.textContent = userData.about;
     profileNameElement.textContent = userData.name;
     profileImage.style.backgroundImage = `url('${userData.avatar}')`;
-  })
-  .catch((err) => {
-    console.log(err);
-  });
 
-getCards()
-  .then((data) => {
-    data.forEach((card) => {
-      const cardElement = createCard(card, handleCardDelete, openPopupImage, likeToggle, currentUserId);
+    cards.forEach((card) => {
+      const cardElement = createCard(card, cardData, currentUserId);
       cardList.append(cardElement);
     });
   })
   .catch((err) => {
     console.log(err);
-  });
+  })
 
 function handleCardDelete(cardElement) {
-  handleOpenPopup(popupTypeConfirm);
+  openPopup(popupTypeConfirm);
   cardIdToDelete = cardElement.dataset.id;
   cardElementToDelete = cardElement;
 }
 
 buttonConfirm.addEventListener("click", () => {
-        getCardToDelete(cardIdToDelete)
+    getCardToDelete(cardIdToDelete)
     .then(() => {
       cardDelete(cardElementToDelete);
       cardIdToDelete = null;
@@ -112,44 +112,41 @@ function openPopupImage(card) {
   popupImage.alt = card.name;
   popupImage.src = card.link;
 
-  handleOpenPopup(popupTypeImage);
+  openPopup(popupTypeImage);
 }
 
 buttons.forEach((button, index) => {
   button.addEventListener("click", () => {
-    handleOpenPopup(popups[index]);
+    resetAndOpenPopup({
+      form: forms[index],
+      popup: popups[index],
+      resetForm: resetFormEditInputs,
+    });
   });
 });
 
-closeButton.forEach((closeButton) => {
-  closeButton.addEventListener("click", () => {
-    const popup = closeButton.closest(".popup");
-    closePopup(popup);
-  });
-});
+popups.forEach(popup => {
+  setModalWindowEventListeners(popup);
+})
 
 function resetFormEditInputs() {
-  nameInput.value = document.querySelector(".profile__title").textContent;
-  descriptionInput.value = document.querySelector(".profile__description").textContent;
+  getUserInfo()
+  .then(data => {
+    nameInput.value = data.name;
+    descriptionInput.value = data.about;
+  });
 }
 
-function handleOpenPopup(popup) {
-  if (popup === popupTypeEdit) {
-    resetFormEditInputs();
-    clearValidation(formEditProfile, validationConfig);
-  } else if (popup === popupTypeAdd) {
-    formNewCard.reset();
-    clearValidation(formNewCard, validationConfig);
-  } else if (popup === popupTypeEditProfileAvatar) {
-    formEditProfileAvatar.reset();
-    clearValidation(formEditProfileAvatar, validationConfig);
-  }
+function resetAndOpenPopup({form, popup, resetForm = () => form.reset()}) {
+  resetForm();
+
+  clearValidation(form, validationConfig);
 
   openPopup(popup);
 }
 
+
 function handleFormEditProfileSubmit(evt) {
-  evt.preventDefault();
 
   setButtonText(evt.target, true);
   const nameValue = nameInput.value;
@@ -162,6 +159,8 @@ function handleFormEditProfileSubmit(evt) {
     .then((data) => {;
       profileNameElement.textContent = data.name;
       profileDescriptionElement.textContent = data.about;
+      
+      closePopup(popupTypeEdit);
     })
     .catch((err) => {
       console.log(err);
@@ -169,14 +168,11 @@ function handleFormEditProfileSubmit(evt) {
     .finally(() => {
       setButtonText(evt.target, false);
     });
-
-  closePopup(popupTypeEdit);
 }
 
 formEditProfile.addEventListener("submit", handleFormEditProfileSubmit);
 
 function newCard(evt) {
-  evt.preventDefault();
 
   setButtonText(evt.target, true);
   const cardName = newCardNameInput.value;
@@ -188,8 +184,8 @@ function newCard(evt) {
   };
 
   createNewCard(newCard)
-    .then((data) => {
-      const cardElement = createCard(data, handleCardDelete, openPopupImage, likeToggle, currentUserId);
+    .then((card) => {
+      const cardElement = createCard(card, cardData, currentUserId);
       cardList.prepend(cardElement);
 
       closePopup(popupTypeAdd);
@@ -204,12 +200,7 @@ function newCard(evt) {
 
 formNewCard.addEventListener("submit", newCard);
 
-buttonEditProfileAvatar.addEventListener("click", () => {
-  handleOpenPopup(popupTypeEditProfileAvatar);
-});
-
 function editAvatar(evt) {
-  evt.preventDefault();
 
   setButtonText(evt.target, true);
   const imageLink = document.querySelector("#edit-profile").value;

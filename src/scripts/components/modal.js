@@ -1,15 +1,12 @@
 export function openPopup(popup){
   popup.classList.add('popup_is-opened');
-  popup.classList.add('popup_is-animated');
 
-  document.addEventListener('click', clickOverlay);
   document.addEventListener('keydown', pressEscape);
 } 
 
 export function closePopup(popup){
   popup.classList.remove('popup_is-opened');
 
-  document.removeEventListener('click', clickOverlay);
   document.removeEventListener('keydown', pressEscape);
 }
 
@@ -26,4 +23,16 @@ function pressEscape(evt) {
       closePopup(openPopup);
     }
   }
+}
+
+export const setModalWindowEventListeners = (modalWindow) => {
+  modalWindow.classList.add('popup_is-animated');
+
+  const closeButton = modalWindow.querySelector(".popup__close");
+
+  closeButton.addEventListener('click', () => {
+    closePopup(modalWindow);
+  });
+
+  modalWindow.addEventListener('click', clickOverlay);
 }

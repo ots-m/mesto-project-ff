@@ -1,6 +1,6 @@
 import { getLikeInfo } from "./api.js";
 
-export const createCard = (card, handleCardDelete, openPopupImage, likeToggle, currentUserId) => {
+export const createCard = (card, { handleCardDelete, openPopupImage, likeToggle, }, currentUserId) => {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
   const cardImage = cardElement.querySelector('.card__image');

@@ -9,15 +9,18 @@ export const config = {
   },
 };
 
+const handleResponse = (res) => {
+  if (!res.ok) {
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+  return res.json();
+}
+
 export const getUserInfo = () => {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers,
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
 
 export const updateUserInfo = (nameValue, descriptionValue) => {
@@ -28,12 +31,8 @@ export const updateUserInfo = (nameValue, descriptionValue) => {
       name: nameValue,
       about: descriptionValue,
     }),
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
 
 export const updateUserAvatar = (imageLink) => {
@@ -41,24 +40,16 @@ export const updateUserAvatar = (imageLink) => {
     method: "PATCH",
     headers: config.headers,
     body: JSON.stringify({ avatar: imageLink }),
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
 
 export const getCards = () => {
   return fetch(`${config.baseUrl}/cards`, {
     method: "GET",
     headers: config.headers,
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
 
 export const createNewCard = (newCard) => {
@@ -66,34 +57,22 @@ export const createNewCard = (newCard) => {
     method: "POST",
     headers: config.headers,
     body: JSON.stringify(newCard),
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
 
 export const getCardToDelete = (cardId) => {
   return fetch(`${config.baseUrl}/cards/${cardId}`, {
     method: "DELETE",
     headers: config.headers,
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
 
 export const getLikeInfo = (cardId, method) => {
   return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: method,
     headers: config.headers,
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  })
+  .then(handleResponse)
 };
