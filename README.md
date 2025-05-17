@@ -1,1 +1,1 @@
-https://github.com/ots-m/mesto-project-ff
+https://ots-m.github.io/mesto-project-ff/
