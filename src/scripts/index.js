@@ -26,7 +26,9 @@ let newCardNameInput = formNewCard.querySelector(".popup__input_type_card-name")
 let newCardLinkInput = formNewCard.querySelector(".popup__input_type_url");
 
 const formEditProfileAvatar = document.forms["edit-profile-avatar"];
+
 const formDeleteCardConfirm = document.forms["delete-card-confirm"];
+const ButtonDeleteConfirm = formDeleteCardConfirm.querySelector('.popup__button_confirm');
 
 const forms = [formNewCard, formEditProfileAvatar];
 
@@ -194,9 +196,7 @@ function handleCardDelete(cardElement) {
   cardElementToDelete = cardElement;
 }
 
-function handleCardConfirmFormSubmit(evt) {
-  evt.preventDefault();
-
+function handleCardDeleteConfirm() {
   getCardToDelete(cardIdToDelete)
   .then(() => {
     cardDelete(cardElementToDelete);
@@ -209,7 +209,7 @@ function handleCardConfirmFormSubmit(evt) {
   });
 }
 
-formDeleteCardConfirm.addEventListener("submit", handleCardConfirmFormSubmit);
+ButtonDeleteConfirm.addEventListener("click", handleCardDeleteConfirm);
 
 function handleAvatarFormSubmit(evt) {
   evt.preventDefault();
